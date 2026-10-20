@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "none",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "rootDir": "./src",
-    "outFile": "./dist/budget-tracker.js",
+    "outDir": "./dist",
     "strict": true,
-    "noEmitOnError": true
+    "esModuleInterop": true,
+    "noEmitOnError": true,
+    "allowJs": true,
+    "checkJs": false,
+    "paths": {
+      "formatCurrency": [
+        "./src/lib/formatCurrency.js"
+      ]
+    }
   },
-  "files": [
-    "src/index.ts"
+  "include": [
+    "src/**/*"
   ]
 }
