@@ -4,6 +4,8 @@ import type { ISummary } from "../interfaces/ISummary.js";
 import { Transaction } from "./Transaction.js";
 import { formatCurrency } from "../lib/budget-utils.js";
 import type { AccountUpdate } from "../interfaces/utility-types.js";
+import { writeFile } from "node:fs/promises";
+import { escapeCsvValue } from "../utils/escapeCsvValue.js";
 
 export class Account implements IAccount, ISummary {
   private transactions: Transaction[] = [];
@@ -59,6 +61,21 @@ export class Account implements IAccount, ISummary {
 
   getSummary(): ISummary {
     return { income: this.income, expenses: this.expenses, balance: this.balance };
+  }
+
+  async exportTransactionsToCSV(filename: string): Promise<void> {
+    const rows = this.transactions.map(transaction => [
+      transaction.id, transaction.amount, transaction.type,
+      transaction.date, transaction.description
+    ].map(escapeCsvValue).join(","));
+    const csv = ["id,amount,type,date,description", ...rows].join("\n") + "\n";
+
+    try {
+      await writeFile(filename, csv, "utf8");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Не удалось экспортировать транзакции в "${filename}": ${message}`);
+    }
   }
 
   getSummaryString(): string {
