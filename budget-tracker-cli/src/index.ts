@@ -6,6 +6,18 @@ import type {
   TransactionConstructorParams, TransactionInstance, TransactionPreview,
   TransactionWithoutDescription
 } from "./interfaces/utility-types.js";
+import type {
+  IsIncome, OptionalTransaction, ReadonlyTransactionFields, TransactionFieldType
+} from "./interfaces/mapped-types.js";
+import type { ITransaction } from "./interfaces/ITransaction.js";
+
+type AmountType = TransactionFieldType<"amount">;
+type UnknownType = TransactionFieldType<"unknown">; // never: такого поля нет.
+type TransactionWithOptionalDescAndDate = OptionalTransaction<"description" | "date">;
+type TransactionReadonlyIdAndType = ReadonlyTransactionFields<"id" | "type">;
+type CheckIncome1 = IsIncome<{ type: "income"; amount: number }>;
+type CheckIncome2 = IsIncome<{ type: "expense"; amount: number }>;
+type CheckIncome3 = IsIncome<ITransaction>;
 
 async function main(): Promise<void> {
   console.log("🚀 Budget Tracker CLI");
@@ -37,6 +49,20 @@ async function main(): Promise<void> {
   console.log("Лимит пополнений:", limits.income, "Лимит трат:", limits.expense);
   console.log("Nullable description:", nullable.description);
   console.log("Типизированные параметры конструктора:", newTransaction.toString());
+
+  const amount: AmountType = complete.amount;
+  const optional: TransactionWithOptionalDescAndDate = {
+    id: complete.id, amount, type: complete.type
+  };
+  const protectedTransaction: TransactionReadonlyIdAndType = {
+    ...preview, description: "Предпросмотр с неизменяемыми id и type"
+  };
+  protectedTransaction.description = "Остальные поля можно менять";
+  const checks: [CheckIncome1, CheckIncome2, CheckIncome3] = [true, false, false];
+  console.log("Тип поля amount:", amount);
+  console.log("Опциональные date и description:", optional);
+  console.log("Readonly-поля id и type:", protectedTransaction);
+  console.log("Условные типы IsIncome:", checks);
   
   const manager = new AccountManager();
   manager.addAccount(personalAccount);
