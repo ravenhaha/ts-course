@@ -1,17 +1,18 @@
 {
   "name": "budget-tracker-cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "Educational personal finance tracker: TypeScript homework topics 2-12",
   "license": "ISC",
   "author": "",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run build && npm run test:types && node --test tests/runtime.test.mjs",
     "build": "tsc",
     "start": "tsx src/index.ts",
     "dev": "tsc --watch",
-    "start:compiled": "node dist/index.js"
+    "start:compiled": "node dist/index.js",
+    "test:types": "tsc -p tsconfig.tests.json"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
@@ -21,6 +22,7 @@
   },
   "dependencies": {
     "moment": "2.30.1",
+    "reflect-metadata": "0.2.2",
     "uuid": "9.0.1"
   }
 }

@@ -30,7 +30,16 @@ async function main(): Promise<void> {
   const lastTransactionId = personalAccount.getTransactions()[2].id;
   
   personalAccount.getTransactions()[0].update({ amount: 1200 });
-  personalAccount.update({ name: "Основной счёт" });
+  try {
+    personalAccount.id = "changed-id";
+  } catch (error: unknown) {
+    console.log("Защита id:", error instanceof Error ? error.message : String(error));
+  }
+  try {
+    personalAccount.update({ name: "Основной счёт" });
+  } catch (error: unknown) {
+    console.log("Защита имени счёта:", error instanceof Error ? error.message : String(error));
+  }
   
   const complete: CompleteTransaction = personalAccount.getTransactions()[0];
   const preview: TransactionPreview = {

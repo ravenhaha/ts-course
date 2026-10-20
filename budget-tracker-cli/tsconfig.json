@@ -10,6 +10,9 @@
     "noEmitOnError": true,
     "allowJs": true,
     "checkJs": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
     "paths": {
       "formatCurrency": [
         "./src/lib/formatCurrency.js"

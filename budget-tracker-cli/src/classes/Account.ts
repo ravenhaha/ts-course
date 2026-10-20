@@ -6,18 +6,25 @@ import { formatCurrency } from "../lib/budget-utils.js";
 import type { AccountUpdate } from "../interfaces/utility-types.js";
 import { writeFile } from "node:fs/promises";
 import { escapeCsvValue } from "../utils/escapeCsvValue.js";
+import { LogClass } from "../decorators/LogClass.js";
+import { LogMethod } from "../decorators/LogMethod.js";
+import { ReadOnly } from "../decorators/ReadOnly.js";
+import { Metadata } from "../decorators/Metadata.js";
 
+@LogClass
 export class Account implements IAccount, ISummary {
+  @Metadata("description", "Массив транзакций счета")
   private transactions: Transaction[] = [];
 
-  private readonly _id: string;
+  @ReadOnly
+  id: string;
 
-  constructor(public name: string) {
-    this._id = uuidv4();
-  }
+  @ReadOnly
+  name: string;
 
-  get id(): string {
-    return this._id;
+  constructor(name: string) {
+    this.id = uuidv4();
+    this.name = name;
   }
 
   update(update: AccountUpdate): void {
@@ -41,6 +48,7 @@ export class Account implements IAccount, ISummary {
     return this.income - this.expenses;
   }
 
+  @LogMethod
   addTransaction(transaction: Transaction): void {
     if (this.transactions.some(item => item.id === transaction.id)) {
       throw new Error(`Транзакция ${transaction.id} уже существует`);
@@ -48,6 +56,7 @@ export class Account implements IAccount, ISummary {
     this.transactions.push(transaction);
   }
 
+  @LogMethod
   removeTransactionById(transactionId: string): boolean {
     const index = this.transactions.findIndex(item => item.id === transactionId);
     if (index === -1) return false;
@@ -55,6 +64,7 @@ export class Account implements IAccount, ISummary {
     return true;
   }
 
+  @LogMethod
   getTransactions(): Transaction[] {
     return [...this.transactions];
   }
@@ -79,7 +89,8 @@ export class Account implements IAccount, ISummary {
   }
 
   getSummaryString(): string {
-    return `${this.name}: баланс ${formatCurrency(this.balance)}, транзакций: ${this.transactions.length}`;
+    const description: string = Reflect.getMetadata("description", this, "transactions");
+    return `${this.name}: баланс ${formatCurrency(this.balance)}, транзакций: ${this.transactions.length}\n${description}`;
   }
 
   toString(): string {
