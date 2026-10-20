@@ -1,3 +1,5 @@
+import { logDecorator } from "../utils/decoratorLogging.js";
+
 export function LogMethod(
   _target: object,
   propertyKey: string | symbol,
@@ -5,9 +7,9 @@ export function LogMethod(
 ): void {
   const method = descriptor.value as (...args: unknown[]) => unknown;
   descriptor.value = function (this: unknown, ...args: unknown[]): unknown {
-    console.log(`Вызов метода ${String(propertyKey)} с аргументами:`, ...args);
+    logDecorator(`Вызов метода ${String(propertyKey)} с аргументами:`, ...args);
     const result = method.apply(this, args);
-    console.log(`Метод ${String(propertyKey)} вернул:`, result);
+    logDecorator(`Метод ${String(propertyKey)} вернул:`, result);
     return result;
   };
 }

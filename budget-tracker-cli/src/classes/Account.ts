@@ -69,6 +69,10 @@ export class Account implements IAccount, ISummary {
     return [...this.transactions];
   }
 
+  clearTransactions(): void {
+    this.transactions = [];
+  }
+
   getSummary(): ISummary {
     return { income: this.income, expenses: this.expenses, balance: this.balance };
   }

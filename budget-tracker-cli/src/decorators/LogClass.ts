@@ -1,12 +1,19 @@
-type Constructor = new (...args: any[]) => object;
+import "reflect-metadata";
+import { logDecorator } from "../utils/decoratorLogging.js";
+
+type Constructor = new (...args: never[]) => object;
 
 export function LogClass<T extends Constructor>(constructor: T): T {
-  const LoggedClass = class extends constructor {
-    constructor(...args: any[]) {
-      super(...args);
-      console.log(`Создан экземпляр класса ${constructor.name} с аргументами:`, ...args);
+  const logged: T = new Proxy(constructor, {
+    construct(target, args: unknown[], newTarget): object {
+      const instance: object = Reflect.construct(target, args, newTarget) as object;
+      logDecorator(`Создан экземпляр класса ${constructor.name} с аргументами:`, ...args);
+      return instance;
     }
-  };
-  Object.defineProperty(LoggedClass, "name", { value: constructor.name });
-  return LoggedClass;
+  });
+  for (const key of Reflect.getOwnMetadataKeys(constructor) as unknown[]) {
+    const value: unknown = Reflect.getOwnMetadata(key, constructor);
+    Reflect.defineMetadata(key, value, logged);
+  }
+  return logged;
 }

@@ -26,6 +26,7 @@ export class AccountManager implements IAccountManager, ISummary {
   removeAccountById(accountId: string): boolean {
     const index = this.accounts.findIndex(account => account.id === accountId);
     if (index === -1) return false;
+    this.accounts[index].clearTransactions();
     this.accounts.splice(index, 1);
     return true;
   }
