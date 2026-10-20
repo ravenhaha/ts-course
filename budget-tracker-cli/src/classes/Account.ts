@@ -3,18 +3,26 @@ import type { IAccount } from "../interfaces/IAccount.js";
 import type { ISummary } from "../interfaces/ISummary.js";
 import { Transaction } from "./Transaction.js";
 import { formatCurrency } from "../lib/budget-utils.js";
+import type { AccountUpdate } from "../interfaces/utility-types.js";
 
 export class Account implements IAccount, ISummary {
   private transactions: Transaction[] = [];
 
   private readonly _id: string;
 
-  constructor(public readonly name: string) {
+  constructor(public name: string) {
     this._id = uuidv4();
   }
 
   get id(): string {
     return this._id;
+  }
+
+  update(update: AccountUpdate): void {
+    if (update.id !== undefined && update.id !== this.id) {
+      throw new Error("Идентификатор счёта нельзя изменить");
+    }
+    if (update.name !== undefined) this.name = update.name;
   }
 
   get income(): number {
